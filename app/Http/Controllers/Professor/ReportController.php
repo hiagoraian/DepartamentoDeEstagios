@@ -7,6 +7,7 @@ use App\Models\Report;
 use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
@@ -67,7 +68,32 @@ class ReportController extends Controller
             'schools.*.city_id' => ['required', 'integer', 'exists:cities,id'],
             'schools.*.school_name' => ['required', 'string', 'max:255'],
             'schools.*.students_impacted' => ['required', 'integer', 'min:0'],
+
+            //pdf
+            'teaching_plan' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'visit_term' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+
         ]);
+
+        // Upload de anexos (PDF)
+        if ($request->hasFile('teaching_plan')) {
+            // apaga o antigo se existir
+            if ($report->teaching_plan_path) {
+                Storage::disk('public')->delete($report->teaching_plan_path);
+            }
+
+            $path = $request->file('teaching_plan')->store('reports/' . $report->id, 'public');
+            $data['teaching_plan_path'] = $path;
+        }
+
+        if ($request->hasFile('visit_term')) {
+            if ($report->visit_term_path) {
+                Storage::disk('public')->delete($report->visit_term_path);
+            }
+
+            $path = $request->file('visit_term')->store('reports/' . $report->id, 'public');
+            $data['visit_term_path'] = $path;
+        }
 
 
         $report->update([

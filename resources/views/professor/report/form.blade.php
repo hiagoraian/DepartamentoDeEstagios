@@ -29,7 +29,8 @@
 </div>
 @endif
 
-<form method="POST" action="{{ route('professor.report.save', $semester) }}">
+<form method="POST" action="{{ route('professor.report.save', $semester) }}" enctype="multipart/form-data">
+
     @csrf
 
     <div class="card shadow-sm border-0 mb-3">
@@ -308,6 +309,67 @@
         </div>
     </div>
 
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">Anexos</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Plano de Ensino (PDF)</label>
+
+                    @if($report->teaching_plan_path)
+                    <div class="mb-2">
+                        <a class="btn btn-outline-primary btn-sm"
+                            href="{{ asset('storage/' . $report->teaching_plan_path) }}"
+                            target="_blank">
+                            Ver arquivo atual
+                        </a>
+                    </div>
+                    @endif
+
+                    <input type="file"
+                        name="teaching_plan"
+                        class="form-control"
+                        accept="application/pdf"
+                        {{ $isLocked ? 'disabled' : '' }}>
+
+                    @error('teaching_plan')
+                    <div class="text-danger small mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Termo de Visita (PDF)</label>
+
+                    @if($report->visit_term_path)
+                    <div class="mb-2">
+                        <a class="btn btn-outline-primary btn-sm"
+                            href="{{ asset('storage/' . $report->visit_term_path) }}"
+                            target="_blank">
+                            Ver arquivo atual
+                        </a>
+                    </div>
+                    @endif
+
+                    <input type="file"
+                        name="visit_term"
+                        class="form-control"
+                        accept="application/pdf"
+                        {{ $isLocked ? 'disabled' : '' }}>
+
+                    @error('visit_term')
+                    <div class="text-danger small mt-1">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="text-muted small mt-3">
+                Somente arquivos PDF. Tamanho máximo: 5MB.
+            </div>
+        </div>
+    </div>
+
+
     @if(!$isLocked)
     <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary w-100">
@@ -327,15 +389,15 @@
 @endif
 
 @if(!$isLocked)
-    <div id="schoolsMeta"
-         data-school-index="{{ is_array(old('schools')) ? count(old('schools')) : ($report->schools ? $report->schools->count() : 0) }}">
-    </div>
+<div id="schoolsMeta"
+    data-school-index="{{ is_array(old('schools')) ? count(old('schools')) : ($report->schools ? $report->schools->count() : 0) }}">
+</div>
 
-    <template id="citiesOptions">
-        @foreach($cities as $city)
-            <option value="{{ $city->id }}">{{ $city->name }}</option>
-        @endforeach
-    </template>
+<template id="citiesOptions">
+    @foreach($cities as $city)
+    <option value="{{ $city->id }}">{{ $city->name }}</option>
+    @endforeach
+</template>
 @endif
 
 <script>
