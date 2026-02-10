@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Professor\ReportController;
 use App\Http\Controllers\Admin\ReportStatusController;
+use App\Http\Controllers\Professor\PasswordController;
+
 
 
 Route::get('/', fn() => redirect()->route('login'));
@@ -38,4 +40,8 @@ Route::middleware('auth')->group(function () {
     // Situação de relatórios (Admin)
     Route::get('/admin/relatorios', [ReportStatusController::class, 'index'])->name('admin.reports.index');
     Route::post('/admin/relatorios/{report}/liberar-edicao', [ReportStatusController::class, 'unlock'])->name('admin.reports.unlock');
+
+    // Alterar senha (Professor)
+    Route::get('/professor/senha', [PasswordController::class, 'edit'])->name('professor.password.edit');
+    Route::post('/professor/senha', [PasswordController::class, 'update'])->name('professor.password.update');
 });

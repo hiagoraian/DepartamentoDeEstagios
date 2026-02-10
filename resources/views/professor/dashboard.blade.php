@@ -18,12 +18,13 @@
             <div class="card-body">
                 <h5 class="fw-bold mb-3">Escolher semestre</h5>
 
-                <form>
+                <form method="GET" action="{{ route('professor.report.show', ['semester' => '__SEM__']) }}"
+                    onsubmit="this.action = this.action.replace('__SEM__', document.getElementById('semesterSelect').value);">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-6">
                             <label class="form-label">Semestre</label>
-                            <select class="form-select">
-                                <option selected disabled>Selecione...</option>
+                            <select id="semesterSelect" class="form-select" required>
+                                <option selected disabled value="">Selecione...</option>
                                 <option>1.2026</option>
                                 <option>2.2026</option>
                                 <option>1.2027</option>
@@ -32,15 +33,24 @@
                         </div>
 
                         <div class="col-md-6">
-                            <a href="{{ route('professor.report.show', '1.2026') }}" class="btn btn-primary w-100">
+                            <button type="submit" class="btn btn-primary w-100">
                                 Abrir relatório
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </form>
+            </div>
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Ações</h5>
 
-                <div class="alert alert-info mt-3 mb-0">
-                    <strong>Obs:</strong> o botão ainda não abre o relatório — vamos implementar depois.
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ route('professor.password.edit') }}" class="btn btn-outline-primary">
+                                Alterar senha
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
