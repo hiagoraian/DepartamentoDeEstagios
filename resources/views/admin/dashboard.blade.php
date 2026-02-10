@@ -49,6 +49,7 @@
                     <h5 class="fw-bold mb-3">Ações rápidas</h5>
 
                     <div class="d-flex flex-wrap gap-2">
+                         <a href="{{ route('admin.cities.index') }}" class="btn btn-primary">Cidades (MG)</a>
                         <a href="#" class="btn btn-primary">Cadastrar professor</a>
                         <a href="#" class="btn btn-outline-primary">Ver situação por semestre</a>
                         <a href="#" class="btn btn-outline-secondary">Relatório geral</a>
