@@ -6,18 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\City;
+
 
 class GeneralReportController extends Controller
 {
     public function index(Request $request)
     {
         $semester = $request->get('semester', '1.2026');
+        $status = $request->get('status', 'all'); // all | submitted | draft
+        $cityId = $request->get('city_id', 'all'); // all ou id
+
 
         $teachersTotal = User::where('is_admin', false)->count();
 
-        // Relatórios do semestre (com escolas e cidade)
         $reportsQuery = Report::with(['user', 'schools.city'])
             ->where('semester', $semester);
+
+        if ($status !== 'all') {
+            $reportsQuery->where('status', $status);
+        }
+
+        if ($cityId !== 'all') {
+            $reportsQuery->whereHas('schools', function ($q) use ($cityId) {
+                $q->where('city_id', $cityId);
+            });
+        }
+
 
         $reports = $reportsQuery->get();
 
@@ -80,6 +95,7 @@ class GeneralReportController extends Controller
         $topCitiesByStudents = $byCity->sortByDesc('students')->take(10)->values();
         $topCitiesBySchools = $byCity->sortByDesc('schools')->take(10)->values();
 
+        $cities = City::orderBy('name')->get();
 
         return view('admin.general-report.index', compact(
             'semester',
@@ -93,7 +109,18 @@ class GeneralReportController extends Controller
             'byCity',
             'productionsCount',
             'topCitiesByStudents',
-            'topCitiesBySchools'
+            'topCitiesBySchools',
+            'status',
+            'cityId',
+            'cities',
         ));
     }
+
+public function show(\App\Models\Report $report)
+{
+    $report->load(['user', 'schools.city']);
+
+    return view('admin.reports.show', compact('report'));
+}
+
 }

@@ -60,4 +60,7 @@ Route::middleware('auth')->group(function () {
 
     // Relatório geral (Admin)
     Route::get('/admin/relatorio-geral', [GeneralReportController::class, 'index'])->name('admin.general-report');
+
+    Route::get('/admin/relatorios/{report}', [GeneralReportController::class, 'show'])->name('admin.reports.show');
+
 });
