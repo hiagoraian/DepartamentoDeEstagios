@@ -10,6 +10,7 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
+        // ADMIN
         User::updateOrCreate(
             ['masp' => '100011'],
             [
@@ -20,6 +21,20 @@ class AdminUserSeeder extends Seeder
                 'is_admin' => true,
                 'professor_type' => 'efetivo',
                 'password' => Hash::make('depe8236'),
+            ]
+        );
+
+        // PROFESSOR - HIAGO
+        User::updateOrCreate(
+            ['masp' => '100011620'],
+            [
+                'name' => 'Hiago Raian Gonçalves Carvalho',
+                'cpf' => '08823706696',
+                'email' => 'hiagoraian98@gmail.com',
+                'phone' => null,
+                'is_admin' => false,
+                'professor_type' => 'efetivo',
+                'password' => Hash::make('123456'),
             ]
         );
     }
