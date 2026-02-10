@@ -11,10 +11,11 @@ Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/professor', function () {
-        return '<h1>Professor</h1>';
+        return view('professor.dashboard');
     })->name('professor.home');
 
     Route::get('/admin', function () {
-        return '<h1>Admin</h1>';
+        return view('admin.dashboard');
     })->name('admin.home');
 });
+
