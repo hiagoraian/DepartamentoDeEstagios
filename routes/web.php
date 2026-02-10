@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Professor\ReportController;
+use App\Http\Controllers\Admin\ReportStatusController;
 
 
 Route::get('/', fn() => redirect()->route('login'));
@@ -33,4 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/professor/relatorio/{semester}', [ReportController::class, 'show'])->name('professor.report.show');
     Route::post('/professor/relatorio/{semester}/salvar', [ReportController::class, 'save'])->name('professor.report.save');
     Route::post('/professor/relatorio/{semester}/enviar', [ReportController::class, 'submit'])->name('professor.report.submit');
+
+    // Situação de relatórios (Admin)
+    Route::get('/admin/relatorios', [ReportStatusController::class, 'index'])->name('admin.reports.index');
+    Route::post('/admin/relatorios/{report}/liberar-edicao', [ReportStatusController::class, 'unlock'])->name('admin.reports.unlock');
 });
