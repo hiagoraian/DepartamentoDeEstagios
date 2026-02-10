@@ -50,14 +50,9 @@
 
                 <div class="d-flex flex-wrap gap-2">
                     <a href="{{ route('admin.cities.index') }}" class="btn btn-primary">Cidades (MG)</a>
-                    <a href="#" class="btn btn-primary">Cadastrar professor</a>
+                    <a href="{{ route('admin.teachers.index') }}" class="btn btn-outline-primary">Professores</a>
                     <a href="{{ route('admin.reports.index') }}" class="btn btn-outline-primary">Situação por semestre</a>
-
                     <a href="#" class="btn btn-outline-secondary">Relatório geral</a>
-                </div>
-
-                <div class="alert alert-info mt-3 mb-0">
-                    <strong>Obs:</strong> os botões ainda não estão ligados às telas — vamos criar depois.
                 </div>
             </div>
         </div>

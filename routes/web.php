@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Professor\ReportController;
 use App\Http\Controllers\Admin\ReportStatusController;
 use App\Http\Controllers\Professor\PasswordController;
-
+use App\Http\Controllers\Admin\TeacherController;
 
 
 Route::get('/', fn() => redirect()->route('login'));
@@ -44,4 +44,12 @@ Route::middleware('auth')->group(function () {
     // Alterar senha (Professor)
     Route::get('/professor/senha', [PasswordController::class, 'edit'])->name('professor.password.edit');
     Route::post('/professor/senha', [PasswordController::class, 'update'])->name('professor.password.update');
+
+    // Professores (Admin)
+    Route::get('/admin/professores', [TeacherController::class, 'index'])->name('admin.teachers.index');
+    Route::get('/admin/professores/novo', [TeacherController::class, 'create'])->name('admin.teachers.create');
+    Route::post('/admin/professores', [TeacherController::class, 'store'])->name('admin.teachers.store');
+    Route::get('/admin/professores/{user}/editar', [TeacherController::class, 'edit'])->name('admin.teachers.edit');
+    Route::put('/admin/professores/{user}', [TeacherController::class, 'update'])->name('admin.teachers.update');
+    Route::delete('/admin/professores/{user}', [TeacherController::class, 'destroy'])->name('admin.teachers.destroy');
 });
