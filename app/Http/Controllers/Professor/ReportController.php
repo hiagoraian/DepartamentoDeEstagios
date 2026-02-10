@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Professor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Report;
+use App\Models\City;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,13 +20,13 @@ class ReportController extends Controller
             ['status' => 'draft', 'edit_unlocked' => false]
         );
 
-        // Se já foi enviado e não está liberado, bloqueia edição (só visualiza)
         $isLocked = $report->status === 'submitted' && $report->edit_unlocked === false;
 
-        // Carrega escolas relacionadas
         $report->load('schools.city');
 
-        return view('professor.report.form', compact('report', 'semester', 'isLocked'));
+        $cities = City::orderBy('name')->get();
+
+        return view('professor.report.form', compact('report', 'semester', 'isLocked', 'cities'));
     }
 
     public function save(Request $request, string $semester)
@@ -61,13 +62,30 @@ class ReportController extends Controller
             'semester_productions' => ['nullable', 'array'],
             'semester_productions.*' => ['string'],
 
-            // anexos depois (vamos implementar já já)
+            // escolas atendidas
+            'schools' => ['nullable', 'array'],
+            'schools.*.city_id' => ['required', 'integer', 'exists:cities,id'],
+            'schools.*.school_name' => ['required', 'string', 'max:255'],
+            'schools.*.students_impacted' => ['required', 'integer', 'min:0'],
         ]);
+
 
         $report->update([
             ...$data,
             'status' => 'draft',
         ]);
+
+        $report->schools()->delete();
+
+        if (!empty($data['schools'])) {
+            foreach ($data['schools'] as $school) {
+                $report->schools()->create([
+                    'city_id' => $school['city_id'],
+                    'school_name' => $school['school_name'],
+                    'students_impacted' => (int) $school['students_impacted'],
+                ]);
+            }
+        }
 
         return redirect()->route('professor.report.show', $semester)
             ->with('success', 'Rascunho salvo com sucesso!');
