@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\ReportStatusController;
 use App\Http\Controllers\Professor\PasswordController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\DashboardController;
-
+use App\Http\Controllers\Admin\GeneralReportController;
 
 
 Route::get('/', fn() => redirect()->route('login'));
@@ -58,4 +58,6 @@ Route::middleware('auth')->group(function () {
     //Dashboard Admin
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin.home');
 
+    // Relatório geral (Admin)
+    Route::get('/admin/relatorio-geral', [GeneralReportController::class, 'index'])->name('admin.general-report');
 });
