@@ -7,6 +7,8 @@ use App\Http\Controllers\Professor\ReportController;
 use App\Http\Controllers\Admin\ReportStatusController;
 use App\Http\Controllers\Professor\PasswordController;
 use App\Http\Controllers\Admin\TeacherController;
+use App\Http\Controllers\Admin\DashboardController;
+
 
 
 Route::get('/', fn() => redirect()->route('login'));
@@ -52,4 +54,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/professores/{user}/editar', [TeacherController::class, 'edit'])->name('admin.teachers.edit');
     Route::put('/admin/professores/{user}', [TeacherController::class, 'update'])->name('admin.teachers.update');
     Route::delete('/admin/professores/{user}', [TeacherController::class, 'destroy'])->name('admin.teachers.destroy');
+
+    //Dashboard Admin
+    Route::get('/admin', [DashboardController::class, 'index'])->name('admin.home');
+
 });
