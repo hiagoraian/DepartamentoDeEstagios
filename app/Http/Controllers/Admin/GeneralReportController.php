@@ -57,6 +57,30 @@ class GeneralReportController extends Controller
         // Ordenar cidades por alunos desc
         $byCity = collect($byCity)->sortByDesc('students')->values();
 
+        // Contagem de produções (quantos relatórios marcaram cada item)
+        $productionsCount = [
+            'artigos' => 0,
+            'palestras' => 0,
+            'anais' => 0,
+            'outros' => 0,
+        ];
+
+        foreach ($reports as $report) {
+            $items = $report->semester_productions ?? [];
+            if (!is_array($items)) $items = [];
+
+            foreach (array_keys($productionsCount) as $key) {
+                if (in_array($key, $items, true)) {
+                    $productionsCount[$key]++;
+                }
+            }
+        }
+
+        // Top 10 cidades por alunos e por escolas (a partir do consolidado)
+        $topCitiesByStudents = $byCity->sortByDesc('students')->take(10)->values();
+        $topCitiesBySchools = $byCity->sortByDesc('schools')->take(10)->values();
+
+
         return view('admin.general-report.index', compact(
             'semester',
             'teachersTotal',
@@ -66,7 +90,10 @@ class GeneralReportController extends Controller
             'totalSchools',
             'totalStudents',
             'reports',
-            'byCity'
+            'byCity',
+            'productionsCount',
+            'topCitiesByStudents',
+            'topCitiesBySchools'
         ));
     }
 }
