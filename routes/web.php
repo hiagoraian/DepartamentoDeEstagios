@@ -3,8 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\CityController;
+use App\Http\Controllers\Professor\ReportController;
 
-Route::get('/', fn () => redirect()->route('login'));
+
+Route::get('/', fn() => redirect()->route('login'));
 
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'store'])->name('login.store');
@@ -27,6 +29,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/admin/cidades/{city}', [CityController::class, 'update'])->name('admin.cities.update');
     Route::delete('/admin/cidades/{city}', [CityController::class, 'destroy'])->name('admin.cities.destroy');
 
+    // Relatórios (Professor)
+    Route::get('/professor/relatorio/{semester}', [ReportController::class, 'show'])->name('professor.report.show');
+    Route::post('/professor/relatorio/{semester}/salvar', [ReportController::class, 'save'])->name('professor.report.save');
+    Route::post('/professor/relatorio/{semester}/enviar', [ReportController::class, 'submit'])->name('professor.report.submit');
 });
-
-
