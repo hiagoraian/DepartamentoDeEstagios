@@ -62,5 +62,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/relatorio-geral', [GeneralReportController::class, 'index'])->name('admin.general-report');
 
     Route::get('/admin/relatorios/{report}', [GeneralReportController::class, 'show'])->name('admin.reports.show');
+    
+    Route::get('/admin/relatorio-geral/pdf', [GeneralReportController::class, 'pdf'])->name('admin.general-report.pdf');
 
 });

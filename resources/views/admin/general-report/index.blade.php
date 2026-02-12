@@ -9,9 +9,16 @@
         <div class="text-muted">Visão geral e consolidados</div>
     </div>
 
-    <a href="{{ route('admin.home', ['semester' => $semester]) }}" class="btn btn-outline-secondary btn-sm">
-        Voltar
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('admin.general-report.pdf', ['semester' => $semester]) }}" class="btn btn-primary btn-sm">
+            Exportar PDF
+        </a>
+
+        <a href="{{ route('admin.home', ['semester' => $semester]) }}" class="btn btn-outline-secondary btn-sm">
+            Voltar
+        </a>
+    </div>
+
 </div>
 
 <div class="card shadow-sm border-0 mb-3">
