@@ -47,7 +47,26 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/professor/senha', [PasswordController::class, 'update'])
         ->name('professor.password.update');
+
+    Route::get('/professor/relatorios/{semester}', [ReportController::class, 'index'])
+        ->name('professor.reports.index');
+
+    Route::get('/professor/relatorios/{semester}/novo', [ReportController::class, 'create'])
+        ->name('professor.reports.create');
+
+    Route::post('/professor/relatorios/{semester}', [ReportController::class, 'store'])
+        ->name('professor.reports.store');
+
+    Route::get('/professor/relatorio/id/{report}', [ReportController::class, 'edit'])
+        ->name('professor.report.edit');
+
+    Route::post('/professor/relatorio/id/{report}/salvar', [ReportController::class, 'saveById'])
+        ->name('professor.report.saveById');
+
+    Route::post('/professor/relatorio/id/{report}/enviar', [ReportController::class, 'submitById'])
+        ->name('professor.report.submitById');
 });
+
 
 
 /*

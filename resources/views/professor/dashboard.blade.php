@@ -18,7 +18,7 @@
             <div class="card-body">
                 <h5 class="fw-bold mb-3">Escolher semestre</h5>
 
-                <form method="GET" action="{{ route('professor.report.show', ['semester' => '__SEM__']) }}"
+                <form method="GET" action="{{ route('professor.reports.index', ['semester' => '__SEM__']) }}"
                     onsubmit="this.action = this.action.replace('__SEM__', document.getElementById('semesterSelect').value);">
                     <div class="row g-2 align-items-end">
                         <div class="col-md-6">

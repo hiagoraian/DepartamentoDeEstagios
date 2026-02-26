@@ -11,6 +11,22 @@ use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
+
+    public function index(string $semester)
+    {
+        $userId = Auth::id();
+        if (!$userId) {
+            return redirect()->route('login');
+        }
+
+        $reports = \App\Models\Report::where('user_id', $userId)
+            ->where('semester', $semester)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('professor.report.index', compact('semester', 'reports'));
+    }
+
     public function show(string $semester)
     {
         $user = Auth::user();
@@ -139,5 +155,95 @@ class ReportController extends Controller
 
         return redirect()->route('professor.report.show', $semester)
             ->with('success', 'Relatório enviado! Edição bloqueada.');
+    }
+
+    public function create(string $semester)
+    {
+        return view('professor.report.create', compact('semester'));
+    }
+
+    public function store(\Illuminate\Http\Request $request, string $semester)
+    {
+        $data = $request->validate([
+            'campus' => ['required', 'string', 'max:255'],
+            'course' => ['required', 'string', 'max:255'],
+            'discipline' => ['required', 'string', 'max:255'],
+        ]);
+
+        $userId = Auth::id();
+        if (!$userId) {
+            return redirect()->route('login');
+        }
+
+        $report = new \App\Models\Report();
+        $report->user_id = $userId;
+        $report->semester = $semester;
+        $report->campus = trim($data['campus']);
+        $report->course = trim($data['course']);
+        $report->discipline = trim($data['discipline']);
+        $report->status = 'draft';
+        $report->edit_unlocked = true;
+        $report->save();
+
+        return redirect()->route('professor.reports.index', $semester)
+            ->with('success', 'Relatório criado com sucesso.');
+    }
+
+    public function edit(\App\Models\Report $report)
+    {
+        if ($report->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            abort(403);
+        }
+
+        $semester = $report->semester;
+
+        $isLocked = !$report->edit_unlocked;
+
+        $cities = \App\Models\City::orderBy('name')->get();
+
+        return view('professor.report.form', compact(
+            'report',
+            'semester',
+            'isLocked',
+            'cities'
+        ));
+    }
+
+
+    public function saveById(\Illuminate\Http\Request $request, \App\Models\Report $report)
+    {
+        // Garantir que o relatório pertence ao usuário logado
+        if ($report->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            abort(403);
+        }
+
+        if (!$report->edit_unlocked) {
+            return back()->with('error', 'Relatório bloqueado para edição.');
+        }
+
+        // Aqui você pode reutilizar a mesma lógica que já tinha no save()
+        $report->fill($request->all());
+        $report->status = 'draft';
+        $report->save();
+
+        return back()->with('success', 'Rascunho salvo com sucesso.');
+    }
+
+
+    public function submitById(\Illuminate\Http\Request $request, \App\Models\Report $report)
+    {
+        if ($report->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            abort(403);
+        }
+
+        if (!$report->edit_unlocked) {
+            return back()->with('error', 'Relatório bloqueado.');
+        }
+
+        $report->status = 'submitted';
+        $report->edit_unlocked = false;
+        $report->save();
+
+        return back()->with('success', 'Relatório enviado com sucesso.');
     }
 }

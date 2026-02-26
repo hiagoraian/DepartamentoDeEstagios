@@ -29,7 +29,7 @@
 </div>
 @endif
 
-<form method="POST" action="{{ route('professor.report.save', $semester) }}" enctype="multipart/form-data">
+<form method="POST" action="{{ route('professor.report.saveById', $report) }}" enctype="multipart/form-data">
 
     @csrf
 
@@ -377,7 +377,7 @@
         </button>
 </form>
 
-<form method="POST" action="{{ route('professor.report.submit', $semester) }}" class="w-100">
+<form method="POST" action="{{ route('professor.report.submitById', $report) }}" class="w-100">
     @csrf
     <button type="submit" class="btn btn-success w-100"
         onclick="return confirm('Após enviar, não será possível editar. Deseja continuar?')">
