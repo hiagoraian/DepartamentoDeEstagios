@@ -201,6 +201,8 @@ class ReportController extends Controller
 
         $cities = \App\Models\City::orderBy('name')->get();
 
+        $report->load('images');
+
         return view('professor.report.form', compact(
             'report',
             'semester',
@@ -220,11 +222,70 @@ class ReportController extends Controller
         if (!$report->edit_unlocked) {
             return back()->with('error', 'Relatório bloqueado para edição.');
         }
+        $request->validate([
+            'images.*' => ['nullable', 'image', 'max:5120'], // 5MB
+            'teaching_plan' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'visit_term' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+        ]);
 
         // Aqui você pode reutilizar a mesma lógica que já tinha no save()
-        $report->fill($request->all());
         $report->status = 'draft';
+
+        // Atualiza APENAS campos de texto (não mexe nos paths se não veio arquivo)
+        $report->institution = $request->input('institution');
+        $report->place = $request->input('place');
+        $report->course = $request->input('course'); // (esse é o curso do relatório, já existia)
+        $report->presentation = $request->input('presentation');
+        $report->activities_description = $request->input('activities_description');
+        $report->teaching_assignments = $request->input('teaching_assignments');
+        $report->didactic_assignments = $request->input('didactic_assignments');
+
+        $report->positive_aspects = $request->input('positive_aspects');
+        $report->negative_aspects = $request->input('negative_aspects');
+        $report->improvement_suggestions = $request->input('improvement_suggestions');
+        $report->enade = $request->input('enade');
+        $report->conclusion = $request->input('conclusion');
+
+        $report->semester_productions = $request->input('semester_productions', []);
+        $report->supervisor_name = $request->input('supervisor_name');
+        $report->operationalization = $request->input('operationalization');
+
         $report->save();
+
+        // Upload de anexos (PDF) - só atualiza se veio arquivo novo
+        if ($request->hasFile('teaching_plan')) {
+            if ($report->teaching_plan_path) {
+                Storage::disk('public')->delete($report->teaching_plan_path);
+            }
+
+            $path = $request->file('teaching_plan')->store('reports/' . $report->id, 'public');
+            $report->teaching_plan_path = $path;
+        }
+
+        if ($request->hasFile('visit_term')) {
+            if ($report->visit_term_path) {
+                Storage::disk('public')->delete($report->visit_term_path);
+            }
+
+            $path = $request->file('visit_term')->store('reports/' . $report->id, 'public');
+            $report->visit_term_path = $path;
+        }
+
+        // salva de novo caso tenha atualizado paths
+        $report->save();
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                if (!$file) continue;
+
+                $path = $file->store('reports/images', 'public');
+
+                \App\Models\ReportImage::create([
+                    'report_id' => $report->id,
+                    'path' => $path,
+                ]);
+            }
+        }
 
         return back()->with('success', 'Rascunho salvo com sucesso.');
     }

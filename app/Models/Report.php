@@ -45,4 +45,8 @@ class Report extends Model
     {
         return $this->hasMany(ReportSchool::class);
     }
+    public function images()
+{
+    return $this->hasMany(\App\Models\ReportImage::class);
+}
 }

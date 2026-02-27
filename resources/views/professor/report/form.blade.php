@@ -38,24 +38,32 @@
             <h5 class="fw-bold mb-3">Configurações Gerais</h5>
 
             <div class="row g-2">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Instituição</label>
                     <input type="text" name="institution" class="form-control"
                         value="{{ old('institution', $report->institution) }}"
                         {{ $isLocked ? 'disabled' : '' }}>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Local</label>
                     <input type="text" name="place" class="form-control"
                         value="{{ old('place', $report->place) }}"
                         {{ $isLocked ? 'disabled' : '' }}>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Curso</label>
                     <input type="text" name="course" class="form-control"
                         value="{{ old('course', $report->course) }}"
+                        {{ $isLocked ? 'disabled' : '' }}>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Supervisor (Nome completo)</label>
+                    <input type="text"
+                        name="supervisor_name"
+                        class="form-control"
+                        value="{{ old('supervisor_name', $report->supervisor_name) }}"
                         {{ $isLocked ? 'disabled' : '' }}>
                 </div>
             </div>
@@ -106,7 +114,7 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Descrição breve das atividades realizadas</label>
+                <label class="form-label">Descrição das atividades realizadas</label>
                 <textarea name="activities_description" class="form-control" rows="4"
                     {{ $isLocked ? 'disabled' : '' }}>{{ old('activities_description', $report->activities_description) }}</textarea>
             </div>
@@ -256,7 +264,13 @@
                 <textarea name="improvement_suggestions" class="form-control" rows="4"
                     {{ $isLocked ? 'disabled' : '' }}>{{ old('improvement_suggestions', $report->improvement_suggestions) }}</textarea>
             </div>
-
+            <div class="mb-3">
+                <label class="form-label">Operacionalização do estágio</label>
+                <textarea name="operationalization"
+                    class="form-control"
+                    rows="5"
+                    {{ $isLocked ? 'disabled' : '' }}>{{ old('operationalization', $report->operationalization) }}</textarea>
+            </div>
             <div class="mb-3">
                 <label class="form-label">ENADE</label>
                 <textarea name="enade" class="form-control" rows="4"
@@ -360,6 +374,37 @@
                     @error('visit_term')
                     <div class="text-danger small mt-1">{{ $message }}</div>
                     @enderror
+                </div>
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Imagens (Anexos)</h5>
+
+                        <input type="file"
+                            name="images[]"
+                            class="form-control"
+                            accept="image/*"
+                            multiple
+                            {{ $isLocked ? 'disabled' : '' }}>
+
+                        <div class="form-text">
+                            Você pode selecionar várias imagens (JPG, PNG, WEBP).
+                        </div>
+
+                        @if($report->images && $report->images->count())
+                        <hr>
+                        <div class="row g-2">
+                            @foreach($report->images as $img)
+                            <div class="col-md-3">
+                                <a href="{{ asset('storage/' . $img->path) }}" target="_blank" class="d-block">
+                                    <img src="{{ asset('storage/' . $img->path) }}"
+                                        class="img-fluid rounded border"
+                                        alt="Imagem anexada">
+                                </a>
+                            </div>
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
                 </div>
             </div>
 
