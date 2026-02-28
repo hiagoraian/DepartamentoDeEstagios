@@ -134,4 +134,7 @@ Route::prefix('admin')
 
         Route::get('/relatorios/{report}', [GeneralReportController::class, 'show'])
             ->name('admin.reports.show');
+
+        Route::delete('/relatorios/{report}', [ReportStatusController::class, 'destroy'])
+            ->name('admin.reports.destroy');
     });

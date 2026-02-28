@@ -3,110 +3,88 @@
 @section('title', 'Admin - Situação dos Relatórios')
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-3">
-        <div>
-            <h4 class="fw-bold mb-0">Situação dos Relatórios</h4>
-            <div class="text-muted">Controle por semestre</div>
-        </div>
 
-        <a href="{{ route('admin.home') }}" class="btn btn-outline-secondary btn-sm">Voltar</a>
+
+<div class="d-flex align-items-end justify-content-between mb-3">
+    <div>
+        <h4 class="fw-bold mb-0">Relatórios do Semestre</h4>
+        <div class="text-muted">Semestre: <strong>{{ $semester }}</strong></div>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+    <form method="GET" action="{{ route('admin.reports.index') }}" class="d-flex gap-2">
+        <select name="semester" class="form-select form-select-sm" style="min-width: 140px" required>
+            <option value="1.2026" {{ $semester === '1.2026' ? 'selected' : '' }}>1.2026</option>
+            <option value="2.2026" {{ $semester === '2.2026' ? 'selected' : '' }}>2.2026</option>
+            <option value="1.2027" {{ $semester === '1.2027' ? 'selected' : '' }}>1.2027</option>
+            <option value="2.2027" {{ $semester === '2.2027' ? 'selected' : '' }}>2.2027</option>
+        </select>
 
-    <div class="card shadow-sm border-0 mb-3">
-        <div class="card-body">
-            <form method="GET" action="{{ route('admin.reports.index') }}" class="row g-2 align-items-end">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Semestre</label>
-                    <select name="semester" class="form-select">
-                        <option value="1.2026" {{ $semester === '1.2026' ? 'selected' : '' }}>1.2026</option>
-                        <option value="2.2026" {{ $semester === '2.2026' ? 'selected' : '' }}>2.2026</option>
-                        <option value="1.2027" {{ $semester === '1.2027' ? 'selected' : '' }}>1.2027</option>
-                        <option value="2.2027" {{ $semester === '2.2027' ? 'selected' : '' }}>2.2027</option>
-                    </select>
-                </div>
+        <button class="btn btn-primary btn-sm">Filtrar</button>
+    </form>
+    <a href="{{ route('admin.home') }}" class="btn btn-outline-secondary btn-sm">Voltar</a>
+</div>
 
-                <div class="col-md-3">
-                    <button class="btn btn-primary w-100">Filtrar</button>
-                </div>
-            </form>
-        </div>
-    </div>
+@if (session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+@if (session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+@endif
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <h6 class="fw-bold mb-3">Professores</h6>
-
-            <div class="table-responsive">
-                <table class="table table-sm align-middle">
-                    <thead>
-                        <tr class="text-muted">
-                            <th>Professor</th>
-                            <th>MASP</th>
-                            <th>Status</th>
-                            <th>Edição</th>
-                            <th class="text-end">Ação</th>
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr class="text-muted">
+                        <th>Professor</th>
+                        <th>MASP</th>
+                        <th>Campus</th>
+                        <th>Curso</th>
+                        <th>Disciplina</th>
+                        <th>Status</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($reports as $report)
+                        <tr>
+                            <td class="fw-semibold">{{ $report->user?->name }}</td>
+                            <td>{{ $report->user?->masp }}</td>
+                            <td>{{ $report->campus ?? '-' }}</td>
+                            <td>{{ $report->course ?? '-' }}</td>
+                            <td>{{ $report->discipline ?? '-' }}</td>
+                            <td>
+                                @if($report->status === 'submitted')
+                                    <span class="badge text-bg-success">Enviado</span>
+                                @else
+                                    <span class="badge text-bg-warning">Rascunho</span>
+                                @endif
+                            </td>
+                            <td class="text-end">
+                                <form method="POST"
+                                      action="{{ route('admin.reports.destroy', ['report' => $report->id]) }}"
+                                      onsubmit="return confirm('Excluir este relatório? Essa ação não pode ser desfeita.');"
+                                      class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="btn btn-outline-danger btn-sm"
+                                            {{ $report->status === 'submitted' ? 'disabled' : '' }}>
+                                        Excluir
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($teachers as $teacher)
-                            @php
-                                $report = $reports->get($teacher->id);
-                                $status = $report?->status ?? null;
-                                $locked = $report ? ($report->status === 'submitted' && !$report->edit_unlocked) : false;
-                            @endphp
-
-                            <tr>
-                                <td>
-                                    <div class="fw-semibold">{{ $teacher->name }}</div>
-                                    <div class="text-muted small">{{ $teacher->professor_type }}</div>
-                                </td>
-                                <td>{{ $teacher->masp }}</td>
-
-                                <td>
-                                    @if(!$report)
-                                        <span class="badge text-bg-secondary">Não iniciou</span>
-                                    @elseif($status === 'draft')
-                                        <span class="badge text-bg-warning">Rascunho</span>
-                                    @elseif($status === 'submitted')
-                                        <span class="badge text-bg-success">Enviado</span>
-                                    @endif
-                                </td>
-
-                                <td>
-                                    @if(!$report)
-                                        <span class="text-muted">—</span>
-                                    @elseif($locked)
-                                        <span class="badge text-bg-danger">Bloqueada</span>
-                                    @else
-                                        <span class="badge text-bg-primary">Liberada</span>
-                                    @endif
-                                </td>
-
-                                <td class="text-end">
-                                    @if($report && $locked)
-                                        <form method="POST" action="{{ route('admin.reports.unlock', $report) }}">
-                                            @csrf
-                                            <button type="submit" class="btn btn-outline-primary btn-sm">
-                                                Liberar edição
-                                            </button>
-                                        </form>
-                                    @else
-                                        <span class="text-muted small">—</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="text-muted small">
-                “Liberar edição” só aparece quando o relatório estiver <strong>Enviado</strong> e <strong>Bloqueado</strong>.
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-muted">Nenhum relatório encontrado.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
+
 @endsection
