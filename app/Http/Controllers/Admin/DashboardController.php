@@ -11,19 +11,17 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Semestre selecionado via query string (?semester=1.2026)
         $semester = $request->get('semester', '1.2026');
 
-        // Total de professores (não-admin)
-        $teachersTotal = User::where('is_admin', false)->count();
+        $teachersTotal = \App\Models\User::where('is_admin', false)->count();
 
-        // Quantos enviaram no semestre
-        $submittedCount = Report::where('semester', $semester)
+        $submittedCount = \App\Models\Report::where('semester', $semester)
             ->where('status', 'submitted')
             ->count();
 
-        // Pendentes = total - enviados (inclui rascunho e não iniciou)
-        $pendingCount = max(0, $teachersTotal - $submittedCount);
+        $pendingCount = \App\Models\Report::where('semester', $semester)
+            ->where('status', 'draft')
+            ->count();
 
         return view('admin.dashboard', compact(
             'semester',
