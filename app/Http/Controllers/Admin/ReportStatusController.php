@@ -23,23 +23,17 @@ class ReportStatusController extends Controller
         return view('admin.reports.index', compact('semester', 'reports'));
     }
 
-    public function unlock(Report $report)
+    public function unlock(\App\Models\Report $report)
     {
-        $report->update([
-            'edit_unlocked' => true,
-        ]);
+        $report->edit_unlocked = true;
+        $report->status = 'draft'; // volta para rascunho
+        $report->save();
 
-        return redirect()->back()->with('success', 'Edição liberada para o professor.');
+        return back()->with('success', 'Edição liberada. O relatório voltou para rascunho.');
     }
 
     public function destroy(Report $report)
     {
-        // Segurança: impedir excluir relatório enviado (por enquanto)
-        if ($report->status === 'submitted') {
-            return back()->with('error', 'Não é possível excluir um relatório enviado.');
-        }
-
-        // Carrega imagens relacionadas
         $report->load('images');
 
         // Apagar PDFs
@@ -51,14 +45,13 @@ class ReportStatusController extends Controller
             Storage::disk('public')->delete($report->visit_term_path);
         }
 
-        // Apagar imagens do storage
+        // Apagar imagens
         foreach ($report->images as $img) {
             if (!empty($img->path)) {
                 Storage::disk('public')->delete($img->path);
             }
         }
 
-        // Apagar registro (imagens no banco serão deletadas via cascade)
         $report->delete();
 
         return back()->with('success', 'Relatório excluído com sucesso.');

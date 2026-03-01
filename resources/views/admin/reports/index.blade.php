@@ -25,10 +25,10 @@
 </div>
 
 @if (session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
+<div class="alert alert-success">{{ session('success') }}</div>
 @endif
 @if (session('error'))
-    <div class="alert alert-danger">{{ session('error') }}</div>
+<div class="alert alert-danger">{{ session('error') }}</div>
 @endif
 
 <div class="card shadow-sm border-0">
@@ -48,38 +48,53 @@
                 </thead>
                 <tbody>
                     @forelse($reports as $report)
-                        <tr>
-                            <td class="fw-semibold">{{ $report->user?->name }}</td>
-                            <td>{{ $report->user?->masp }}</td>
-                            <td>{{ $report->campus ?? '-' }}</td>
-                            <td>{{ $report->course ?? '-' }}</td>
-                            <td>{{ $report->discipline ?? '-' }}</td>
-                            <td>
-                                @if($report->status === 'submitted')
-                                    <span class="badge text-bg-success">Enviado</span>
-                                @else
-                                    <span class="badge text-bg-warning">Rascunho</span>
-                                @endif
-                            </td>
-                            <td class="text-end">
+                    <tr>
+                        <td class="fw-semibold">{{ $report->user?->name }}</td>
+                        <td>{{ $report->user?->masp }}</td>
+                        <td>{{ $report->campus ?? '-' }}</td>
+                        <td>{{ $report->course ?? '-' }}</td>
+                        <td>{{ $report->discipline ?? '-' }}</td>
+                        <td>
+                            @if($report->status === 'submitted')
+                            <span class="badge text-bg-success">Enviado</span>
+                            @else
+                            <span class="badge text-bg-warning">Rascunho</span>
+                            @endif
+                        </td>
+                        <td class="text-end">
+                            <div class="d-inline-flex gap-2">
+
+                                {{-- Liberar edição (continua só para enviados bloqueados) --}}
+                                @if($report->status === 'submitted' && !$report->edit_unlocked)
                                 <form method="POST"
-                                      action="{{ route('admin.reports.destroy', ['report' => $report->id]) }}"
-                                      onsubmit="return confirm('Excluir este relatório? Essa ação não pode ser desfeita.');"
-                                      class="d-inline">
+                                    action="{{ route('admin.reports.unlock', ['report' => $report->id]) }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="btn btn-outline-warning btn-sm">
+                                        Liberar edição
+                                    </button>
+                                </form>
+                                @endif
+
+                                {{-- Excluir (agora para todos) --}}
+                                <form method="POST"
+                                    action="{{ route('admin.reports.destroy', ['report' => $report->id]) }}"
+                                    onsubmit="return confirm('Excluir este relatório? Essa ação não pode ser desfeita.');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"
-                                            class="btn btn-outline-danger btn-sm"
-                                            {{ $report->status === 'submitted' ? 'disabled' : '' }}>
+                                        class="btn btn-outline-danger btn-sm">
                                         Excluir
                                     </button>
                                 </form>
-                            </td>
-                        </tr>
+
+                            </div>
+                        </td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="7" class="text-muted">Nenhum relatório encontrado.</td>
-                        </tr>
+                    <tr>
+                        <td colspan="7" class="text-muted">Nenhum relatório encontrado.</td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
