@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Models\SemesterTeacher;
 
 class TeacherController extends Controller
 {
@@ -96,5 +97,32 @@ class TeacherController extends Controller
         $user->delete();
 
         return redirect()->route('admin.teachers.index')->with('success', 'Professor removido com sucesso!');
+    }
+    public function toggleSemester(Request $request, \App\Models\User $user)
+    {
+        $request->validate([
+            'semester' => ['required', 'string'],
+        ]);
+
+        $semester = $request->semester;
+
+        $record = SemesterTeacher::where('user_id', $user->id)
+            ->where('semester', $semester)
+            ->first();
+
+        if ($record) {
+            // Alterna estado
+            $record->is_enabled = !$record->is_enabled;
+            $record->save();
+        } else {
+            // Cria habilitado
+            SemesterTeacher::create([
+                'user_id' => $user->id,
+                'semester' => $semester,
+                'is_enabled' => true,
+            ]);
+        }
+
+        return back()->with('success', 'Status do professor atualizado para o semestre.');
     }
 }

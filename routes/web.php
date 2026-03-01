@@ -137,4 +137,7 @@ Route::prefix('admin')
 
         Route::delete('/relatorios/{report}', [ReportStatusController::class, 'destroy'])
             ->name('admin.reports.destroy');
+
+        Route::post('/professores/{user}/semestre', [TeacherController::class, 'toggleSemester'])
+            ->name('admin.teachers.semester.toggle');
     });
